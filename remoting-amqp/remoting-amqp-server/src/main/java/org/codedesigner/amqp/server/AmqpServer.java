@@ -1,17 +1,13 @@
 package org.codedesigner.amqp.server;
 
 import org.codedesigner.remoting.api.CabBookingService;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.remoting.service.AmqpInvokerServiceExporter;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 @SpringBootApplication
 public class AmqpServer {
@@ -25,13 +21,23 @@ public class AmqpServer {
      */
 
     @Bean
-    CabBookingService bookingService() {
+    public CabBookingService bookingService() {
         return new CabBookingServiceImpl();
     }
 
     @Bean
-    Queue queue() {
-        return new Queue("remotingQueue");
+    public DirectExchange exchange() {
+        return new DirectExchange("remoting.exchange");
+    }
+
+    @Bean
+    public Queue queue() {
+        return new Queue(CabBookingService.class.getSimpleName());
+    }
+
+    @Bean
+    public Binding binding(Queue queue, Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(CabBookingService.class.getSimpleName()).noargs();
     }
 
     @Bean
