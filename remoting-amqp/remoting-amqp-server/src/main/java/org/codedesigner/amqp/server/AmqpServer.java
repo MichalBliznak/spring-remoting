@@ -21,11 +21,6 @@ public class AmqpServer {
      */
 
     @Bean
-    public CabBookingService bookingService() {
-        return new CabBookingServiceImpl();
-    }
-
-    @Bean
     public DirectExchange exchange() {
         return new DirectExchange("remoting.exchange");
     }
